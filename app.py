@@ -439,17 +439,22 @@ elif "Predict" in page:
             try:
                 loaded_obj = pickle.load(open("bike_model.pkl", "rb"))
                 # If you saved a Pipeline → just predict
-            if hasattr(loaded_obj, "predict"):
-                model = loaded_obj
-                prediction = model.predict(features)[0]
+                if hasattr(loaded_obj, "predict"):
+                    model = loaded_obj
+                    prediction = model.predict(features)[0]
                 # If you saved (model, scaler)
-        else:
-            model, scaler = loaded_obj
-            features_scaled = scaler.transform(features)
-            prediction = model.predict(features_scaled)[0]
+                else:
+                    model, scaler = loaded_obj
+                    features_scaled = scaler.transform(features)
+                    prediction = model.predict(features_scaled)[0]
 
         # Convert to proper integer
-        prediction = max(1, int(round(prediction)))
+                prediction = max(1, int(round(prediction)))
+        
+                st.success(f"Estimated Bike Demand: {prediction}")
+
+            except Exception as e:
+                st.error(f"Prediction error: {e}")
                 # Smart detection of model output type:
                 # log(count) models output ~3-9 (exp gives realistic 20-8000)
                 # normalized models output 0.0-1.5
