@@ -414,8 +414,8 @@ elif "Predict" in page:
                         format_func=lambda x:{1:"Clear / Sunny",2:"Cloudy / Mist",
                                               3:"Light Rain",4:"Heavy Rain"}[x])
         temp_c     = st.slider("Temperature (°C)", -5, 40, 22)
-        temp       = round((temp_c + 8) / 47, 4)   # approx denormalize
-        atemp      = round(temp * 0.97, 4)
+        temp       = temp_c
+        atemp      = temp_c
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown('<div style="font-size:0.75rem;color:#3a5472;margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase;">More Options</div>', unsafe_allow_html=True)
@@ -437,19 +437,23 @@ elif "Predict" in page:
 
         if predict_btn:
             try:
-                model    = pickle.load(open("bike_model.pkl", "rb"))
-                pred_raw = model.predict(features)[0]
+                loaded_obj = pickle.load(open("bike_model.pkl", "rb"))
+                # If you saved a Pipeline → just predict
+            if hasattr(loaded_obj, "predict"):
+                model = loaded_obj
+                prediction = model.predict(features)[0]
+                # If you saved (model, scaler)
+        else:
+            model, scaler = loaded_obj
+            features_scaled = scaler.transform(features)
+            prediction = model.predict(features_scaled)[0]
 
+        # Convert to proper integer
+        prediction = max(1, int(round(prediction)))
                 # Smart detection of model output type:
                 # log(count) models output ~3-9 (exp gives realistic 20-8000)
                 # normalized models output 0.0-1.5
                 # raw count models output actual integers or large floats
-                if 3.0 <= pred_raw <= 9.0:
-                    prediction = max(1, int(round(np.exp(pred_raw))))
-                elif pred_raw <= 1.5:
-                    prediction = max(1, int(round(pred_raw * 977)))
-                else:
-                    prediction = max(1, int(round(pred_raw)))
 
                 # Estimate casual/registered split (typical ~20/80 ratio, adjusted by hour/weekday)
                 casual_ratio = 0.35 if workingday == 0 else 0.18
