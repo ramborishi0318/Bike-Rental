@@ -1,0 +1,35 @@
+﻿# CatBoost temporary files (ALWAYS ignore)
+catboost_info/
+training_info/
+*.cbm
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.env
+venv/
+env/
+.venv/
+ENV/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Note: .pkl files are NOT ignored - they go to Git LFS
